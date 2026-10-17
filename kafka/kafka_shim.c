@@ -11,6 +11,24 @@
 #include <stdlib.h>
 
 /* ============================================================================
+ * glibc CSU stubs
+ *
+ * Lean's bundled start file (Scrt1.o) still references __libc_csu_init and
+ * __libc_csu_fini, which glibc >= 2.34 no longer provides. Executables that
+ * link against the system glibc (we add -L/usr/lib/x86_64-linux-gnu to find
+ * librdkafka) then fail with undefined symbols. Since 2.34, __libc_start_main
+ * runs the init/fini arrays itself and ignores these hooks, so empty bodies
+ * are correct. They are weak so that a strong definition elsewhere (e.g.
+ * redis-lean's shim, linked into the same executable) takes precedence.
+ * ============================================================================ */
+
+__attribute__((weak)) void __libc_csu_init(int argc, char **argv, char **envp) {
+    (void)argc; (void)argv; (void)envp;
+}
+
+__attribute__((weak)) void __libc_csu_fini(void) {}
+
+/* ============================================================================
  * Helper functions for Option types
  * ============================================================================ */
 

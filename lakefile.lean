@@ -16,15 +16,18 @@ package kafkaLean where
 @[default_target]
 lean_lib KafkaLean
 
-lean_lib Examples
+lean_lib Examples where
+  globs := #[.submodules `Examples]
 
+-- Traced build: the object (and the archive below) is rebuilt when kafka_shim.c
+-- changes. A `compileO` + `.pure` job has no trace, so edits to the shim never
+-- reached libkafka_shim.a.
 target kafka_shim_o pkg : FilePath := do
-  let srcFile := pkg.dir / "kafka" / "kafka_shim.c"
   let oFile := pkg.buildDir / "c" / "kafka_shim.o"
-  IO.FS.createDirAll oFile.parent.get!
-  let flags := #["-fPIC", "-O2", "-I", (← getLeanIncludeDir).toString, "-I/usr/local/include"]
-  compileO oFile srcFile flags
-  return .pure oFile
+  let srcJob ← inputTextFile <| pkg.dir / "kafka" / "kafka_shim.c"
+  -- Path-dependent, kept out of the trace
+  let weakArgs := #["-I", (← getLeanIncludeDir).toString, "-I/usr/local/include"]
+  buildO oFile srcJob weakArgs #["-fPIC", "-O2"]
 
 extern_lib libkafka_shim pkg := do
   let shimObj ← kafka_shim_o.fetch
