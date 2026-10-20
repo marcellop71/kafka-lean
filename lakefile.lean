@@ -35,7 +35,7 @@ extern_lib libkafka_shim pkg := do
   buildStaticLib (pkg.staticLibDir / name) #[shimObj]
 
 require zlogLean from git
-  "git@github.com:marcellop71/zlog-lean.git" @ "v4.35.0"
+  "https://github.com/proofinity-it/zlog-lean" @ "v4.35.0"
 
 lean_exe examples where
   root := `Examples.Main

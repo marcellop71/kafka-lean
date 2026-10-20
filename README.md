@@ -754,3 +754,8 @@ kafka-lean/
 │   └── Main.lean        # Usage examples
 └── lakefile.lean        # Build configuration
 ```
+
+## License
+
+Copyright © 2026 Proofinity s.r.l. Licensed under the Apache License,
+Version 2.0: see [LICENSE](LICENSE) and [NOTICE](NOTICE).
